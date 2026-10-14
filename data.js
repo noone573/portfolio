@@ -1,63 +1,89 @@
 /* Portfolio content.
-   Edit this with the Portfolio Editor (portfolio-editor/editor.html), which rewrites this file when you save.
+   Edited with the Portfolio Editor (portfolio-editor/editor.html), which rewrites this file when you save.
    Empty sections are hidden on the site automatically. */
 window.PORTFOLIO = {
   "profile": {
     "name": "Juniel",
     "role": "Student Developer",
-    "tagline": "I build web apps, data tools and embedded systems, from Django backends to PIC microcontrollers.",
+    "tagline": "I build web apps, data tools and embedded systems, from Django backends",
     "location": "Philippines",
     "status": "Open to opportunities",
     "email": "junielvillablanca2005@gmail.com",
-    "photo": "",
+    "photo": "assets/profile.png",
     "socials": [
-      { "label": "GitHub", "url": "https://github.com/noone573" }
+      {
+        "label": "GitHub",
+        "url": "https://github.com/noone573"
+      }
     ]
   },
-  "about": [],
+  "about": [
+    "4th year student..."
+  ],
   "skills": [
-    { "group": "Languages", "items": ["Python", "JavaScript", "HTML & CSS", "SQL", "Assembly (PIC)"] },
-    { "group": "Frameworks & Tools", "items": ["Django", "Git & GitHub", "Proteus", "MPLAB"] },
-    { "group": "Interests", "items": ["Web development", "Parallel computing", "Embedded systems"] }
+    {
+      "group": "Languages",
+      "items": [
+        "Python",
+        "JavaScript",
+        "HTML & CSS",
+        "SQL",
+        "Java"
+      ]
+    },
+    {
+      "group": "Frameworks & Tools",
+      "items": [
+        "Django",
+        "Git & GitHub"
+      ]
+    },
+    {
+      "group": "Interests",
+      "items": [
+        "Web development",
+        "Game development"
+      ]
+    }
   ],
   "projects": [
     {
-      "title": "BiPSU SRMS with Eligibility Recommender",
-      "year": "Thesis",
-      "description": "My thesis project: a web-based records management system for BiPSU with a built-in eligibility recommender, backed by a Django API.",
-      "image": "",
-      "tags": ["Django", "Python", "Web"],
-      "links": { "github": "https://github.com/noone573/Thesis", "demo": "", "file": "" }
-    },
-    {
-      "title": "Parallel vs. Serial Data Filtering",
-      "year": "2026",
-      "description": "Benchmarks serial and multiprocessing filtering of a 10-million-row CSV, splitting the file into byte ranges across 16 worker processes.",
-      "image": "",
-      "tags": ["Python", "Performance"],
-      "links": { "github": "", "demo": "", "file": "" }
-    },
-    {
-      "title": "PIC16F877 Microcontroller Project",
-      "year": "2026",
-      "description": "Assembly program for the PIC16F877 driving a PCF8574 I/O expander, developed in MPLAB and simulated in Proteus.",
-      "image": "",
-      "tags": ["Embedded", "Assembly"],
-      "links": { "github": "", "demo": "", "file": "" }
-    },
-    {
-      "title": "Artemis",
-      "year": "2025",
-      "description": "A web application built with Django.",
-      "image": "",
-      "tags": ["Django", "Python", "Web"],
-      "links": { "github": "https://github.com/noone573/game", "demo": "", "file": "" }
+      "title": "Secret pa",
+      "year": "2026, Thesis ",
+      "description": "it is Scholarship Record Management System for BiPSU, it is use to help the VPSEA office to manage scholars and also help Students by using a rule based recommender which recommends the student if they are eligible to a scholarship",
+      "image": "assets/projects/project-mv85j0mv.png",
+      "tags": [
+        "Python",
+        "Django",
+        "Web"
+      ],
+      "links": {
+        "github": "",
+        "demo": "https://backend-vb5d.onrender.com/",
+        "file": ""
+      }
     }
   ],
-  "certificates": [],
+  "certificates": [
+    {
+      "title": "Networking Basics certificate ",
+      "issuer": "Cisco Networking Academy",
+      "date": "May 24, 2026",
+      "file": "assets/certificates/networking-basics-certificate-junielvill-mv8603o9.pdf",
+      "thumbnail": "assets/certificates/networking-basics-certificate-preview-mv86299h.png",
+      "credentialUrl": ""
+    }
+  ],
   "resume": {
     "file": "",
-    "education": [],
+    "education": [
+      {
+        "title": " Bachelor of Science in Computer Science",
+        "place": "Biliran Province State University",
+        "period": "2023-2026",
+        "details": ""
+      }
+    ],
     "experience": []
   }
 };
