@@ -28,24 +28,21 @@ window.PORTFOLIO = {
         "JavaScript",
         "HTML & CSS",
         "SQL",
-        "Assembly (PIC)"
+        "Java"
       ]
     },
     {
       "group": "Frameworks & Tools",
       "items": [
         "Django",
-        "Git & GitHub",
-        "Proteus",
-        "MPLAB"
+        "Git & GitHub"
       ]
     },
     {
       "group": "Interests",
       "items": [
         "Web development",
-        "Parallel computing",
-        "Embedded systems"
+        "Game development"
       ]
     }
   ],
@@ -67,10 +64,26 @@ window.PORTFOLIO = {
       }
     }
   ],
-  "certificates": [],
+  "certificates": [
+    {
+      "title": "Networking Basics certificate ",
+      "issuer": "Cisco Networking Academy",
+      "date": "May 24, 2026",
+      "file": "assets/certificates/networking-basics-certificate-junielvill-mv8603o9.pdf",
+      "thumbnail": "assets/certificates/networking-basics-certificate-preview-mv86299h.png",
+      "credentialUrl": ""
+    }
+  ],
   "resume": {
     "file": "",
-    "education": [],
+    "education": [
+      {
+        "title": " Bachelor of Science in Computer Science",
+        "place": "Biliran Province State University",
+        "period": "2023-2026",
+        "details": ""
+      }
+    ],
     "experience": []
   }
 };
