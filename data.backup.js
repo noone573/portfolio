@@ -27,7 +27,6 @@ window.PORTFOLIO = {
         "Python",
         "JavaScript",
         "HTML & CSS",
-        "SQL",
         "Java"
       ]
     },
