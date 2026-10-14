@@ -47,22 +47,6 @@ window.PORTFOLIO = {
   ],
   "projects": [
     {
-      "title": "Propane Point",
-      "year": "Project",
-      "description": "search for for propane sellers ",
-      "image": "assets/projects/propane-point-mv88o07d.png",
-      "tags": [
-        "Python",
-        "Django",
-        "Web"
-      ],
-      "links": {
-        "github": "",
-        "demo": "https://prophane.onrender.com",
-        "file": ""
-      }
-    },
-    {
       "title": "Secret pa",
       "year": "2026, Thesis ",
       "description": "it is Scholarship Record Management System for BiPSU, it is use to help the VPSEA office to manage scholars and also help Students by using a rule based recommender which recommends the student if they are eligible to a scholarship",
@@ -75,6 +59,22 @@ window.PORTFOLIO = {
       "links": {
         "github": "",
         "demo": "https://backend-vb5d.onrender.com/",
+        "file": ""
+      }
+    },
+    {
+      "title": "Propane Point",
+      "year": "Project",
+      "description": "search for for propane sellers ",
+      "image": "assets/projects/propane-point-mv88o07d.png",
+      "tags": [
+        "Python",
+        "Django",
+        "Web"
+      ],
+      "links": {
+        "github": "",
+        "demo": "https://prophane.onrender.com",
         "file": ""
       }
     }
