@@ -7,7 +7,7 @@
   <meta name="description" content="Personal portfolio: projects, certificates and resume.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     // Apply saved theme before paint to avoid a flash
@@ -18,37 +18,29 @@
   <a class="skip" href="#main">Skip to content</a>
 
   <header class="site-header" id="site-header">
-    <div class="container nav">
-      <a href="#top" class="brand" id="brand"></a>
-      <nav class="nav-links" id="site-nav" aria-label="Main">
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#certificates">Certificates</a>
-        <a href="#resume">Resume</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <div class="nav-actions">
-        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
-        <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"></button>
+    <div class="container">
+      <div class="nav">
+        <a href="#top" class="brand" id="brand"></a>
+        <nav class="nav-links" id="site-nav" aria-label="Main"></nav>
+        <div class="nav-actions">
+          <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
+          <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"></button>
+        </div>
       </div>
     </div>
   </header>
 
   <main id="main">
     <section class="hero" id="top">
+      <div class="hero-bg" aria-hidden="true"></div>
       <div class="container hero-inner" id="hero"></div>
     </section>
 
     <section class="section" id="about">
       <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">About</p>
-            <h2>A little about me</h2>
-          </div>
-        </div>
+        <div class="section-head"><div class="section-title"><p class="eyebrow"></p><h2></h2></div></div>
         <div class="about-grid">
-          <div class="about-text" id="about-text"></div>
+          <div class="about-main" id="about-main"></div>
           <div class="skills" id="skills"></div>
         </div>
       </div>
@@ -57,36 +49,23 @@
     <section class="section" id="projects">
       <div class="container">
         <div class="section-head">
-          <div>
-            <p class="eyebrow">Projects</p>
-            <h2>Things I've built</h2>
-          </div>
+          <div class="section-title"><p class="eyebrow"></p><h2></h2></div>
           <div class="chips" id="project-filters" aria-label="Filter projects"></div>
         </div>
-        <div class="grid" id="project-grid"></div>
+        <div class="project-grid" id="project-grid"></div>
       </div>
     </section>
 
     <section class="section" id="certificates">
       <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Certificates</p>
-            <h2>Certifications &amp; awards</h2>
-          </div>
-        </div>
-        <div class="grid grid-certs" id="cert-grid"></div>
+        <div class="section-head"><div class="section-title"><p class="eyebrow"></p><h2></h2></div></div>
+        <div class="cert-grid" id="cert-grid"></div>
       </div>
     </section>
 
     <section class="section" id="resume">
       <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Resume</p>
-            <h2>Education &amp; experience</h2>
-          </div>
-        </div>
+        <div class="section-head"><div class="section-title"><p class="eyebrow"></p><h2></h2></div></div>
         <div class="resume-grid">
           <div id="timeline"></div>
           <div id="resume-viewer"></div>

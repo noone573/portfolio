@@ -66,11 +66,35 @@ window.PORTFOLIO = {
   ],
   "certificates": [
     {
+      "title": "Introduction to AI Literacy and Responsible Use",
+      "issuer": "Mapúa University",
+      "date": "September 2026",
+      "file": "assets/certificates/classof2026-issued-1-mv8861l8.pdf",
+      "thumbnail": "assets/certificates/introduction-to-ai-literacy-and-responsi-mv8899rv.png",
+      "credentialUrl": ""
+    },
+    {
       "title": "Networking Basics certificate ",
       "issuer": "Cisco Networking Academy",
       "date": "May 24, 2026",
       "file": "assets/certificates/networking-basics-certificate-junielvill-mv8603o9.pdf",
       "thumbnail": "assets/certificates/networking-basics-certificate-preview-mv86299h.png",
+      "credentialUrl": ""
+    },
+    {
+      "title": "E certificate",
+      "issuer": "Computer Science Society (BiPSU)",
+      "date": "October 2025",
+      "file": "assets/certificates/e-certificate-mv883730.pdf",
+      "thumbnail": "assets/certificates/e-certificate-preview-mv885qg6.png",
+      "credentialUrl": ""
+    },
+    {
+      "title": "E Certificate of Completion",
+      "issuer": "Computer Science Society (BiPSU)",
+      "date": "April 2025",
+      "file": "assets/certificates/e-certificate-of-completion-mv87yy8k.pdf",
+      "thumbnail": "assets/certificates/e-certificate-of-completion-preview-mv88137v.png",
       "credentialUrl": ""
     }
   ],
