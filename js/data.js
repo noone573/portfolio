@@ -1,5 +1,5 @@
 /* Portfolio content.
-   Edited with the Portfolio Editor (portfolio-editor/editor.html), which rewrites this file when you save.
+   Written by the Portfolio Editor (a local tool, not part of the site) whenever content is saved.
    Empty sections are hidden on the site automatically. */
 window.PORTFOLIO = {
   "profile": {
@@ -18,7 +18,7 @@ window.PORTFOLIO = {
     ]
   },
   "about": [
-    "4th year student..."
+    "I'm still currently taking my 4th year as a Computer Science Student, I'm mostly focusing on my thesis right now, but after that i will focus in constantly improving myself by learning, creating more projects and gaining more certificates to improve my resume."
   ],
   "skills": [
     {
@@ -47,7 +47,7 @@ window.PORTFOLIO = {
   ],
   "projects": [
     {
-      "title": "Secret pa",
+      "title": "SRMS",
       "year": "2026, Thesis ",
       "description": "it is Scholarship Record Management System for BiPSU, it is use to help the VPSEA office to manage scholars and also help Students by using a rule based recommender which recommends the student if they are eligible to a scholarship",
       "image": "assets/projects/project-mv85j0mv.png",
@@ -64,8 +64,8 @@ window.PORTFOLIO = {
     },
     {
       "title": "Propane Point",
-      "year": "Project",
-      "description": "search for for propane sellers ",
+      "year": "Final Project",
+      "description": "aim to help people to find propane stores nearby.",
       "image": "assets/projects/propane-point-mv88o07d.png",
       "tags": [
         "Python",
@@ -95,22 +95,6 @@ window.PORTFOLIO = {
       "file": "assets/certificates/networking-basics-certificate-junielvill-mv8603o9.pdf",
       "thumbnail": "assets/certificates/networking-basics-certificate-preview-mv86299h.png",
       "credentialUrl": ""
-    },
-    {
-      "title": "E certificate",
-      "issuer": "Computer Science Society (BiPSU)",
-      "date": "October 2025",
-      "file": "assets/certificates/e-certificate-mv883730.pdf",
-      "thumbnail": "assets/certificates/e-certificate-preview-mv885qg6.png",
-      "credentialUrl": ""
-    },
-    {
-      "title": "E Certificate of Completion",
-      "issuer": "Computer Science Society (BiPSU)",
-      "date": "April 2025",
-      "file": "assets/certificates/e-certificate-of-completion-mv87yy8k.pdf",
-      "thumbnail": "assets/certificates/e-certificate-of-completion-preview-mv88137v.png",
-      "credentialUrl": ""
     }
   ],
   "resume": {
@@ -124,5 +108,47 @@ window.PORTFOLIO = {
       }
     ],
     "experience": []
+  },
+  "site": {
+    "brand": "",
+    "sections": [
+      {
+        "id": "about",
+        "show": true,
+        "nav": "",
+        "title": ""
+      },
+      {
+        "id": "skills",
+        "show": true,
+        "nav": "",
+        "title": ""
+      },
+      {
+        "id": "projects",
+        "show": true,
+        "nav": "",
+        "title": ""
+      },
+      {
+        "id": "certificates",
+        "show": true,
+        "nav": "",
+        "title": ""
+      },
+      {
+        "id": "resume",
+        "show": true,
+        "nav": "",
+        "title": ""
+      },
+      {
+        "id": "contact",
+        "show": true,
+        "nav": "",
+        "title": "",
+        "text": ""
+      }
+    ]
   }
 };

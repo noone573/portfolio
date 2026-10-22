@@ -1,6 +1,9 @@
-/* Renders the portfolio from data.js. You normally don't need to edit this file.
-   Sections with no content are hidden automatically. Menu labels, headings, order and
-   visibility come from the "site" settings (edited in the editor's Navigation tab). */
+/* ==========================================================================
+   Portfolio renderer
+   Builds the page from the content in js/data.js. Sections with no content are
+   hidden automatically. Menu labels, headings, order and visibility come from
+   the optional "site" settings in data.js.
+   ========================================================================== */
 (() => {
   "use strict";
 
@@ -12,23 +15,26 @@
 
   /* ---------- Content (empty entries are dropped) ---------- */
   const has = (v) => (typeof v === "string" ? v.trim() !== "" : Array.isArray(v) ? v.length > 0 : v != null);
+  const clean = (v) => (has(v) ? String(v).trim() : "");
   const about = [].concat(D.about || []).filter(has);
   const skillGroups = (D.skills || [])
-    .map((g) => ({ group: g.group || "", items: (g.items || []).filter(has) }))
-    .filter((g) => g.items.length);
+    .map((g) => ({ group: clean(g.group), items: (g.items || []).filter(has).map(clean) }))
+    .filter((g) => g.items.length > 0);
   const projects = (D.projects || []).filter((p) => p && (has(p.title) || has(p.description) || has(p.image)));
   const certificates = (D.certificates || []).filter((c) => c && (has(c.title) || has(c.file)));
   const education = (R.education || []).filter((i) => i && (has(i.title) || has(i.place)));
   const experience = (R.experience || []).filter((i) => i && (has(i.title) || has(i.place)));
   const socials = (P.socials || []).filter((s) => s && has(s.url));
-  const resumeFile = has(R.file) ? R.file : "";
-  const downloadName = has(P.name) ? `${P.name.trim()} - Resume${(resumeFile.match(/\.[a-z0-9]+$/i) || [""])[0]}` : "";
+  const email = clean(P.email);
+  const resumeFile = clean(R.file);
+  const downloadName = has(P.name) ? `${clean(P.name)} - Resume${(resumeFile.match(/\.[a-z0-9]+$/i) || [""])[0]}` : "";
 
-  /* ---------- Section settings ---------- */
-  const SECTION_IDS = ["about", "projects", "certificates", "resume", "contact"];
+  /* ---------- Section settings: labels, headings, order, visibility ---------- */
+  const SECTION_IDS = ["about", "skills", "projects", "certificates", "resume", "contact"];
   const both = education.length > 0 && experience.length > 0;
   const DEFAULTS = {
-    about: { nav: "About", title: about.length ? "About me" : "Skills & interests" },
+    about: { nav: "About", title: "About me" },
+    skills: { nav: "Skills", title: "Skills & interests" },
     projects: { nav: "Projects", title: "Things I've built" },
     certificates: { nav: "Certificates", title: "Certificates" },
     resume: {
@@ -37,22 +43,38 @@
     },
     contact: { nav: "Contact", title: "Let's work together.", text: "Have an opportunity, a project, or just want to say hi? My inbox is open." },
   };
+
+  // Saved order first; any section missing from it is slotted in after its default neighbour.
+  function sectionOrder(saved) {
+    const order = saved.map((s) => s.id).filter((id, i, all) => SECTION_IDS.includes(id) && all.indexOf(id) === i);
+    SECTION_IDS.forEach((id, i) => {
+      if (order.includes(id)) return;
+      const before = SECTION_IDS.slice(0, i).reverse().find((prev) => order.includes(prev));
+      order.splice(before ? order.indexOf(before) + 1 : 0, 0, id);
+    });
+    return order;
+  }
+
   const saved = Array.isArray(S.sections) ? S.sections.filter(Boolean) : [];
-  const order = [...saved.map((s) => s.id), ...SECTION_IDS].filter((id, i, all) => SECTION_IDS.includes(id) && all.indexOf(id) === i);
+  const order = sectionOrder(saved);
   const cfg = Object.fromEntries(order.map((id) => {
     const s = saved.find((x) => x.id === id) || {};
-    const pick = (key) => (has(s[key]) ? s[key].trim() : DEFAULTS[id][key]);
+    const pick = (key) => (has(s[key]) ? clean(s[key]) : DEFAULTS[id][key]);
     return [id, { show: s.show !== false, nav: pick("nav"), title: pick("title"), text: pick("text") }];
   }));
   const shown = {
-    about: cfg.about.show && (about.length > 0 || skillGroups.length > 0),
+    about: cfg.about.show && about.length > 0,
+    skills: cfg.skills.show && skillGroups.length > 0,
     projects: cfg.projects.show && projects.length > 0,
     certificates: cfg.certificates.show && certificates.length > 0,
     resume: cfg.resume.show && (education.length > 0 || experience.length > 0 || !!resumeFile),
-    contact: cfg.contact.show && (has(P.email) || socials.length > 0),
+    contact: cfg.contact.show && (!!email || socials.length > 0),
   };
 
-  /* ---------- Icons ---------- */
+  // Phones and some browsers can't show PDFs inside the page; offer an "Open PDF" button there instead.
+  const canEmbedPdf = navigator.pdfViewerEnabled !== false && !matchMedia("(pointer: coarse)").matches;
+
+  /* ---------- Icons (inline SVG) ---------- */
   const stroke = (paths) =>
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
   const ICONS = {
@@ -81,32 +103,33 @@
     spark: stroke('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/>'),
   };
 
-  /* ---------- Helpers ---------- */
+  /* ---------- DOM helpers ---------- */
+  // el("a", { class: "btn", href: "#x" }, "Label") → <a class="btn" href="#x">Label</a>
   function el(tag, props = {}, ...kids) {
-    const n = document.createElement(tag);
-    for (const [k, v] of Object.entries(props)) {
-      if (v == null || v === false) continue;
-      if (k === "class") n.className = v;
-      else if (k === "html") n.innerHTML = v; // only used for the trusted icon markup above
-      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
-      else n.setAttribute(k, v === true ? "" : v);
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (value == null || value === false) continue;
+      if (key === "class") node.className = value;
+      else if (key === "html") node.innerHTML = value; // only used for the trusted icon markup above
+      else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+      else node.setAttribute(key, value === true ? "" : value);
     }
-    for (const c of kids.flat()) {
-      if (c == null || c === false || c === "") continue;
-      n.append(c.nodeType ? c : document.createTextNode(String(c)));
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false || kid === "") continue;
+      node.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
     }
-    return n;
+    return node;
   }
-  const icon = (name, cls = "i") => el("span", { class: cls, html: ICONS[name] || ICONS.link, style: cls === "i" ? "display:contents" : null });
+  const icon = (name, cls = "i") => el("span", { class: cls, html: ICONS[name] || ICONS.link });
   const isPdf = (path) => /\.pdf(?:$|[?#])/i.test(path || "");
   const fileName = (path) => (path || "").split("/").pop();
-  const external = (url) => (/^https?:/i.test(url) ? { target: "_blank", rel: "noopener noreferrer" } : {});
+  const newTab = (url) => (/^https?:/i.test(url) ? { target: "_blank", rel: "noopener noreferrer" } : {});
 
   function initials(text) {
     const words = String(text || "?").replace(/[^\p{L}\p{N}\s]/gu, "").trim().split(/\s+/);
     return (words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2)).toUpperCase();
   }
-  // Hue in the teal → blue → violet range so placeholders match the accent colors
+  // Placeholder hue in the teal → blue → violet range so it matches the accent colors
   function hue(text) {
     let h = 0;
     for (const ch of String(text)) h = (h * 31 + ch.codePointAt(0)) % 997;
@@ -124,56 +147,85 @@
 
   function socialLinks() {
     const items = socials.slice();
-    if (has(P.email)) items.push({ label: "Email", url: `mailto:${P.email}`, icon: "mail" });
+    if (email) items.push({ label: "Email", url: `mailto:${email}`, icon: "mail" });
     if (!items.length) return null;
     return el("div", { class: "socials" },
       items.map((s) => el("a", {
-        class: "icon-btn", href: s.url, "aria-label": s.label || "Link", title: s.label || s.url, ...external(s.url),
+        class: "icon-btn", href: s.url, "aria-label": s.label || "Link", title: s.label || s.url, ...newTab(s.url),
         html: ICONS[s.icon || String(s.label || "").toLowerCase()] || ICONS.link,
       }))
     );
   }
 
-  const resumeButton = (label, cls = "btn") =>
-    resumeFile && el("a", { class: `${cls} resume-dl`, href: resumeFile, download: downloadName }, icon("download"), label);
+  const resumeButton = (label) =>
+    resumeFile && el("a", { class: "btn resume-dl", href: resumeFile, download: downloadName }, icon("download"), label);
 
-  /* ---------- Sections ---------- */
+  // "Open PDF" message for browsers that can't show a PDF inside the page
+  function pdfFallback(path, text = "This browser can't preview the PDF here.") {
+    return el("div", { class: "doc-fallback" },
+      icon("file"),
+      el("p", {}, text),
+      el("a", { class: "btn btn-sm", href: path, target: "_blank", rel: "noopener" }, icon("external"), "Open PDF")
+    );
+  }
+  const pdfView = (path, label) => (canEmbedPdf
+    ? el("object", { data: path, type: "application/pdf", "aria-label": label }, pdfFallback(path))
+    : pdfFallback(path, "Tap below to open the PDF."));
+
+  /* ---------- Header & hero ---------- */
   function renderBrand() {
-    const name = has(S.brand) ? S.brand.trim() : P.name || "Portfolio";
-    document.title = P.name ? `${P.name} | Portfolio` : "Portfolio";
-    $("#brand").append(el("span", { class: "brand-mark", "aria-hidden": "true" }, initials(name)), el("span", {}, name));
+    const name = clean(S.brand) || clean(P.name) || "Portfolio";
+    document.title = P.name ? `${clean(P.name)} | Portfolio` : "Portfolio";
+    $("#brand").replaceChildren(
+      el("span", { class: "brand-mark", "aria-hidden": "true" }, initials(name)),
+      el("span", { class: "brand-name" }, name)
+    );
   }
 
   function renderHero() {
     const hero = $("#hero");
-    const second = resumeFile && shown.resume
+    const secondButton = resumeFile && shown.resume
       ? resumeButton("Download resume")
       : shown.contact && el("a", { class: "btn", href: "#contact" }, icon("mail"), "Contact me");
-    const badgeInHero = has(P.photo) && has(P.location);
+    const badgeOnPhoto = has(P.photo) && has(P.location);
 
     hero.append(el("div", { class: "hero-text" },
-      P.status && el("p", { class: "status-pill reveal" }, el("span", { class: "pulse", "aria-hidden": "true" }), P.status),
-      el("h1", { class: "reveal" }, P.name ? [el("span", { class: "hello" }, "Hi, I'm"), el("span", { class: "grad" }, P.name)] : "Welcome"),
-      P.role && el("p", { class: "role reveal" }, P.role),
-      P.tagline && el("p", { class: "tagline reveal" }, P.tagline),
-      (shown.projects || second) && el("div", { class: "cta reveal" },
+      has(P.status) && el("p", { class: "status-pill reveal" }, el("span", { class: "pulse", "aria-hidden": "true" }), clean(P.status)),
+      el("h1", { class: "reveal" }, has(P.name) ? [el("span", { class: "hello" }, "Hi, I'm"), el("span", { class: "grad" }, clean(P.name))] : "Welcome"),
+      has(P.role) && el("p", { class: "role reveal" }, clean(P.role)),
+      has(P.tagline) && el("p", { class: "tagline reveal" }, clean(P.tagline)),
+      (shown.projects || secondButton) && el("div", { class: "cta reveal" },
         shown.projects && el("a", { class: "btn btn-primary", href: "#projects" }, "View my work", icon("arrow", "arrow")),
-        second
+        secondButton
       ),
       el("div", { class: "hero-meta reveal" },
-        P.location && !badgeInHero && el("span", { class: "meta-item" }, icon("pin"), P.location),
+        has(P.location) && !badgeOnPhoto && el("span", { class: "meta-item" }, icon("pin"), clean(P.location)),
         socialLinks()
       )
     ));
 
     if (!has(P.photo)) { hero.classList.add("no-photo"); return; }
     hero.append(el("div", { class: "portrait reveal" },
-      el("div", { class: "portrait-frame" }, imageOr(P.photo, `Photo of ${P.name || ""}`, P.name)),
-      badgeInHero && el("div", { class: "portrait-badge" },
+      el("div", { class: "portrait-frame" }, imageOr(P.photo, `Portrait of ${clean(P.name) || "the site owner"}`, P.name)),
+      badgeOnPhoto && el("div", { class: "portrait-badge" },
         el("span", { class: "badge-icon", html: ICONS.pin }),
-        el("span", {}, el("small", {}, "Based in"), el("strong", {}, P.location))
+        el("span", {}, el("small", {}, "Based in"), el("strong", {}, clean(P.location)))
       )
     ));
+  }
+
+  /* ---------- About & Skills ---------- */
+  function renderAbout() {
+    const latest = education[0];
+    const facts = [
+      has(P.location) && ["Based in", clean(P.location)],
+      latest && ["Education", [latest.title, latest.place].filter(has).map(clean).join(", ")],
+      email && ["Email", el("a", { href: `mailto:${email}` }, email)],
+    ].filter(Boolean);
+
+    $("#about-text").append(...about.map((p) => el("p", { class: "reveal" }, clean(p))));
+    if (facts.length) $("#facts").append(...facts.map(([term, value]) => el("div", {}, el("dt", {}, term), el("dd", {}, value))));
+    else { $("#facts").remove(); $("#about .about-grid").classList.add("single"); }
   }
 
   function skillIcon(group) {
@@ -183,53 +235,34 @@
     return "spark";
   }
 
-  function renderAbout() {
-    const grid = $("#about .about-grid");
-    const latest = education[0];
-    const facts = [
-      has(P.location) && ["Based in", P.location],
-      latest && ["Education", [latest.title, latest.place].filter(has).map((s) => s.trim()).join(", ")],
-      has(P.email) && ["Email", el("a", { href: `mailto:${P.email}` }, P.email)],
-    ].filter(Boolean);
-
-    const main = $("#about-main");
-    main.append(...about.map((p) => el("p", { class: "reveal" }, p)));
-    if (about.length && facts.length) {
-      main.append(el("dl", { class: "facts reveal" }, facts.map(([k, v]) => el("div", {}, el("dt", {}, k), el("dd", {}, v)))));
-    }
-    if (!about.length) { main.remove(); grid.classList.add("single"); }
-
-    if (skillGroups.length) {
-      $("#skills").append(...skillGroups.map((g) =>
-        el("div", { class: "skill-card reveal" },
-          el("div", { class: "skill-head" },
-            el("span", { class: "skill-icon", html: ICONS[skillIcon(g.group)] }),
-            el("h3", {}, g.group || "Skills")
-          ),
-          el("ul", { class: "tags" }, g.items.map((s) => el("li", { class: "tag" }, s)))
-        )
-      ));
-    } else {
-      $("#skills").remove();
-      grid.classList.add("single");
-    }
+  function renderSkills() {
+    $("#skills-grid").append(...skillGroups.map((g) =>
+      el("div", { class: "skill-card reveal" },
+        el("div", { class: "skill-head" },
+          el("span", { class: "skill-icon", html: ICONS[skillIcon(g.group)] }),
+          el("h3", {}, g.group || "Skills")
+        ),
+        el("ul", { class: "tags" }, g.items.map((s) => el("li", { class: "tag" }, s)))
+      )
+    ));
   }
 
+  /* ---------- Projects ---------- */
   function projectCard(p, featured) {
     const links = p.links || {};
-    const tags = (p.tags || []).filter(has);
-    const title = p.title || "Untitled project";
+    const tags = (p.tags || []).filter(has).map(clean);
+    const title = clean(p.title) || "Untitled project";
     return el("article", { class: `card project reveal${featured ? " featured" : ""}`, "data-tags": tags.join("|") },
       el("div", { class: "thumb" }, imageOr(p.image, `Screenshot of ${title}`, title)),
       el("div", { class: "card-body" },
-        has(p.year) && el("span", { class: "kicker" }, p.year.trim()),
+        has(p.year) && el("span", { class: "kicker" }, clean(p.year)),
         el("h3", {}, title),
-        p.description && el("p", { class: "card-text" }, p.description),
-        tags.length > 0 && el("ul", { class: "tags" }, tags.map((t) => el("li", { class: "tag" }, t))),
+        has(p.description) && el("p", { class: "card-text" }, clean(p.description)),
+        tags.length > 0 && el("ul", { class: "tags", "aria-label": "Technologies" }, tags.map((t) => el("li", { class: "tag" }, t))),
         (links.demo || links.github || links.file) && el("div", { class: "card-actions" },
-          links.demo && el("a", { class: "btn btn-sm btn-primary", href: links.demo, ...external(links.demo) }, icon("external"), "Live demo"),
-          links.github && el("a", { class: "btn btn-sm", href: links.github, ...external(links.github) }, icon("github"), "Source code"),
-          links.file && el("a", { class: "btn btn-sm", href: links.file, target: "_blank", rel: "noopener" }, icon("file"), "Document")
+          links.demo && el("a", { class: "btn btn-sm btn-primary", href: links.demo, "aria-label": `Live demo of ${title} (opens in a new tab)`, ...newTab(links.demo) }, icon("external"), "Live demo"),
+          links.github && el("a", { class: "btn btn-sm", href: links.github, "aria-label": `Source code of ${title} on GitHub (opens in a new tab)`, ...newTab(links.github) }, icon("github"), "Source code"),
+          links.file && el("a", { class: "btn btn-sm", href: links.file, target: "_blank", rel: "noopener", "aria-label": `Document for ${title} (opens in a new tab)` }, icon("file"), "Document")
         )
       )
     );
@@ -237,11 +270,12 @@
 
   function renderProjects() {
     const grid = $("#project-grid");
-    // With an odd number of projects, the first one is shown large so the grid stays even.
+    // With an odd number of projects the first one is shown wide so the grid stays even.
     const featureFirst = projects.length % 2 === 1;
     grid.append(...projects.map((p, i) => projectCard(p, featureFirst && i === 0)));
 
-    const tags = [...new Set(projects.flatMap((p) => (p.tags || []).filter(has)))];
+    // Tag filter (only worth showing with 3+ projects and 2+ different tags)
+    const tags = [...new Set(projects.flatMap((p) => (p.tags || []).filter(has).map(clean)))];
     if (projects.length < 3 || tags.length < 2) return;
     const chips = ["All", ...tags].map((t) =>
       el("button", { class: "chip", type: "button", "aria-pressed": String(t === "All"), onclick: () => filter(t) }, t)
@@ -255,61 +289,55 @@
     $("#project-filters").append(...chips);
   }
 
-  function certThumb(c) {
-    if (c.thumbnail) return imageOr(c.thumbnail, "", c.title);
+  /* ---------- Certificates ---------- */
+  function certThumb(c, title) {
+    const alt = `Preview of the ${title} certificate`;
+    if (c.thumbnail) return imageOr(c.thumbnail, alt, title);
     if (isPdf(c.file)) return el("div", { class: "pdf-tile" }, icon("file"), el("span", {}, "PDF"));
-    return imageOr(c.file, "", c.title);
+    return imageOr(c.file, alt, title);
   }
 
   function renderCertificates() {
     $("#cert-grid").append(...certificates.map((c) => {
-      const meta = [c.issuer, c.date].filter(has).map((s) => s.trim()).join(" · ");
+      const title = clean(c.title) || "Certificate";
+      const meta = [c.issuer, c.date].filter(has).map(clean).join(" · ");
       return el("article", { class: "card reveal" },
-        el("button", { class: "thumb cert-thumb", type: "button", "aria-label": `View certificate: ${c.title || "certificate"}`, onclick: () => openViewer(c) }, certThumb(c)),
+        el("button", { class: "thumb cert-thumb", type: "button", "aria-label": `View certificate: ${title}`, onclick: () => openViewer(c, title) }, certThumb(c, title)),
         el("div", { class: "card-body cert-body" },
-          el("h3", {}, (c.title || "Certificate").trim()),
+          el("h3", {}, title),
           meta && el("p", { class: "cert-meta" }, icon("award"), meta),
-          c.credentialUrl && el("a", { class: "text-link", href: c.credentialUrl, ...external(c.credentialUrl) }, icon("check"), "Verify credential")
+          has(c.credentialUrl) && el("a", { class: "text-link", href: c.credentialUrl, "aria-label": `Verify the ${title} credential (opens in a new tab)`, ...newTab(c.credentialUrl) }, icon("check"), "Verify credential")
         )
       );
     }));
   }
 
-  function timelineGroup(title, iconName, items) {
+  /* ---------- Education / Experience / Resume ---------- */
+  // When both lists are shown each gets an <h3> label and entries use <h4>;
+  // otherwise the section <h2> already names the list, so entries use <h3>.
+  function timeline(label, iconName, items) {
     if (!items.length) return null;
+    const entryHeading = both ? "h4" : "h3";
     return el("div", { class: "tl-group reveal" },
-      el("h3", {}, icon(iconName), title),
+      both && el("h3", {}, icon(iconName), label),
       el("ol", { class: "tl" }, items.map((it) =>
         el("li", {},
           el("div", { class: "tl-card" },
-            has(it.period) && el("span", { class: "period" }, it.period.trim()),
-            has(it.title) && el("h4", {}, it.title.trim()),
-            has(it.place) && el("p", { class: "place" }, it.place.trim()),
-            has(it.details) && el("p", { class: "details" }, it.details.trim())
+            has(it.period) && el("span", { class: "period" }, clean(it.period)),
+            has(it.title) && el(entryHeading, { class: "tl-title" }, clean(it.title)),
+            has(it.place) && el("p", { class: "place" }, clean(it.place)),
+            has(it.details) && el("p", { class: "details" }, clean(it.details))
           )
         )
       ))
     );
   }
 
-  function pdfFallback(path) {
-    return el("div", { class: "doc-fallback" },
-      icon("file"),
-      el("p", {}, "This browser can't preview the PDF here."),
-      el("a", { class: "btn btn-sm", href: path, target: "_blank", rel: "noopener" }, icon("external"), "Open PDF")
-    );
-  }
-
   function renderResume() {
     const grid = $("#resume .resume-grid");
-    // Only label the groups when both are shown; otherwise the section heading already says it.
-    const groups = both
-      ? [timelineGroup("Education", "school", education), timelineGroup("Experience", "briefcase", experience)]
-      : [timelineGroup("", "school", education), timelineGroup("", "briefcase", experience)];
-    const filled = groups.filter(Boolean);
-    if (!both) filled.forEach((g) => g.querySelector("h3").remove());
+    const groups = [timeline("Education", "school", education), timeline("Experience", "briefcase", experience)].filter(Boolean);
 
-    if (filled.length) $("#timeline").append(...filled);
+    if (groups.length) $("#timeline").append(...groups);
     else { $("#timeline").remove(); grid.classList.add("single"); }
 
     if (!resumeFile) { $("#resume-viewer").remove(); grid.classList.add("single"); return; }
@@ -320,35 +348,34 @@
         el("a", { class: "btn btn-sm", href: resumeFile, target: "_blank", rel: "noopener" }, icon("external"), "Open"),
         el("a", { class: "btn btn-sm btn-primary", href: resumeFile, download: downloadName }, icon("download"), "Download")
       ),
-      isPdf(resumeFile)
-        ? el("object", { data: `${resumeFile}#view=FitH`, type: "application/pdf", "aria-label": "Resume" }, pdfFallback(resumeFile))
-        : el("div", { class: "viewer-body" }, imageOr(resumeFile, "Resume", "CV"))
+      isPdf(resumeFile) ? pdfView(`${resumeFile}#view=FitH`, "Resume") : el("div", { class: "viewer-body" }, imageOr(resumeFile, "Resume", "CV"))
     ));
 
-    // On a live site, hide the resume if the file is missing instead of showing a broken viewer.
+    // On the live site, hide the resume if its file is missing instead of showing a broken viewer.
     if (/^https?:/.test(location.protocol)) {
       fetch(resumeFile, { method: "HEAD" }).then((res) => {
         if (res.ok) return;
         document.querySelectorAll(".resume-dl").forEach((a) => a.remove());
         $("#resume-viewer")?.remove();
         grid.classList.add("single");
-        if (!filled.length) hideSection("resume");
+        if (!groups.length) hideSection("resume");
       }).catch(() => {});
     }
   }
 
+  /* ---------- Contact & footer ---------- */
   function renderContact() {
-    const email = has(P.email) ? P.email.trim() : "";
-    const copyBtn = email && el("button", { class: "btn", type: "button" }, icon("copy"), el("span", {}, "Copy email"));
-    if (copyBtn) {
-      copyBtn.addEventListener("click", async () => {
-        const label = copyBtn.querySelector("span:last-child");
+    let copyButton = null;
+    if (email) {
+      const label = el("span", {}, "Copy email");
+      copyButton = el("button", { class: "btn", type: "button" }, icon("copy"), label);
+      copyButton.addEventListener("click", async () => {
         try { await navigator.clipboard.writeText(email); label.textContent = "Copied!"; }
-        catch (e) { label.textContent = email; }
+        catch (e) { label.textContent = email; } // clipboard blocked: show the address instead
         setTimeout(() => { label.textContent = "Copy email"; }, 2000);
       });
     }
-    $("#contact-inner").append(
+    $("#contact-inner").replaceChildren(
       el("div", { class: "contact-card reveal" },
         el("p", { class: "eyebrow" }),
         el("h2", {}, cfg.contact.title),
@@ -356,7 +383,7 @@
         email && el("a", { class: "contact-email", href: `mailto:${email}` }, email),
         el("div", { class: "cta" },
           email && el("a", { class: "btn btn-primary", href: `mailto:${email}` }, icon("mail"), "Email me"),
-          copyBtn,
+          copyButton,
           shown.resume && resumeButton("Resume")
         ),
         socials.length > 0 && socialLinks()
@@ -366,7 +393,7 @@
 
   function renderFooter() {
     $("#footer").append(
-      el("p", {}, `© ${new Date().getFullYear()} ${P.name || ""}`),
+      el("p", {}, `© ${new Date().getFullYear()} ${clean(P.name)}`),
       el("a", { href: "#top" }, "Back to top ↑")
     );
   }
@@ -374,8 +401,7 @@
   function hideSection(id) {
     const section = document.getElementById(id);
     if (section) section.hidden = true;
-    const link = $(`.nav-links a[href="#${id}"]`);
-    if (link) link.remove();
+    $(`.nav-links a[href="#${id}"]`)?.remove();
   }
 
   // Puts sections in the chosen order, builds the menu, and numbers the visible sections.
@@ -391,68 +417,73 @@
     visible.forEach((id, i) => {
       const eyebrow = $(`#${id} .eyebrow`);
       if (eyebrow) eyebrow.replaceChildren(el("span", { class: "num" }, String(i + 1).padStart(2, "0")), el("span", { class: "line", "aria-hidden": "true" }), cfg[id].nav);
-      const h2 = $(`#${id} .section-title h2`);
-      if (h2) h2.textContent = cfg[id].title;
+      const heading = $(`#${id} .section-title h2`);
+      if (heading) heading.textContent = cfg[id].title;
     });
   }
 
-  /* ---------- Certificate viewer ---------- */
+  /* ---------- Certificate viewer (pop-up) ---------- */
   const dialog = $("#viewer");
-  function openViewer(c) {
+  function openViewer(c, title) {
     const body = $("#viewer-body");
     const actions = $("#viewer-actions");
-    $("#viewer-title").textContent = c.title || "Certificate";
-    $("#viewer-sub").textContent = [c.issuer, c.date].filter(has).join(" · ");
+    $("#viewer-title").textContent = title;
+    $("#viewer-sub").textContent = [c.issuer, c.date].filter(has).map(clean).join(" · ");
     body.replaceChildren();
     actions.replaceChildren();
 
     if (!c.file) body.append(el("p", { class: "doc-fallback" }, "No file attached."));
-    else if (isPdf(c.file)) body.append(el("object", { data: c.file, type: "application/pdf", "aria-label": c.title || "Certificate" }, pdfFallback(c.file)));
-    else body.append(imageOr(c.file, c.title || "Certificate", c.title));
+    else if (!isPdf(c.file)) body.append(imageOr(c.file, `${title} certificate`, title));
+    else if (canEmbedPdf) body.append(pdfView(c.file, `${title} certificate`));
+    else body.append(c.thumbnail ? imageOr(c.thumbnail, `Preview of the ${title} certificate`, title) : pdfFallback(c.file, "Tap below to open the PDF."));
 
-    if (c.file) actions.append(el("a", { class: "btn btn-sm", href: c.file, target: "_blank", rel: "noopener" }, icon("external"), "Open file"));
-    if (c.credentialUrl) actions.append(el("a", { class: "btn btn-sm btn-primary", href: c.credentialUrl, ...external(c.credentialUrl) }, icon("check"), "Verify credential"));
+    if (c.file) actions.append(el("a", { class: "btn btn-sm", href: c.file, target: "_blank", rel: "noopener" }, icon("external"), isPdf(c.file) ? "Open PDF" : "Open file"));
+    if (has(c.credentialUrl)) actions.append(el("a", { class: "btn btn-sm btn-primary", href: c.credentialUrl, ...newTab(c.credentialUrl) }, icon("check"), "Verify credential"));
 
     if (typeof dialog.showModal === "function") dialog.showModal();
     else if (c.file) window.open(c.file, "_blank", "noopener");
   }
-  $("#viewer-close").innerHTML = ICONS.close;
-  $("#viewer-close").addEventListener("click", () => dialog.close());
-  dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
-  dialog.addEventListener("close", () => $("#viewer-body").replaceChildren());
 
-  /* ---------- Chrome: theme, menu, scroll ---------- */
+  function setupViewer() {
+    $("#viewer-close").innerHTML = ICONS.close;
+    $("#viewer-close").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); }); // click on backdrop
+    dialog.addEventListener("close", () => $("#viewer-body").replaceChildren());
+  }
+
+  /* ---------- Theme, menu, scrolling ---------- */
   function setupTheme() {
     const root = document.documentElement;
-    const btn = $("#theme-toggle");
-    const mq = matchMedia("(prefers-color-scheme: dark)");
-    const isDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : mq.matches);
+    const button = $("#theme-toggle");
+    const systemDark = matchMedia("(prefers-color-scheme: dark)");
+    const isDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : systemDark.matches);
     const paint = () => {
-      btn.innerHTML = isDark() ? ICONS.sun : ICONS.moon;
-      btn.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
+      button.innerHTML = isDark() ? ICONS.sun : ICONS.moon;
+      button.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
     };
-    btn.addEventListener("click", () => {
+    button.addEventListener("click", () => {
       root.dataset.theme = isDark() ? "light" : "dark";
       try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
       paint();
     });
-    mq.addEventListener?.("change", paint);
+    systemDark.addEventListener?.("change", paint);
     paint();
   }
 
   function setupMenu() {
-    const btn = $("#menu-toggle");
+    const button = $("#menu-toggle");
     const nav = $("#site-nav");
-    const set = (open) => {
+    const setOpen = (open) => {
       nav.classList.toggle("open", open);
-      btn.setAttribute("aria-expanded", String(open));
-      btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-      btn.innerHTML = open ? ICONS.close : ICONS.menu;
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      button.innerHTML = open ? ICONS.close : ICONS.menu;
     };
-    btn.addEventListener("click", () => set(!nav.classList.contains("open")));
-    nav.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
-    document.addEventListener("click", (e) => { if (!e.target.closest(".nav")) set(false); });
-    set(false);
+    button.addEventListener("click", () => setOpen(!nav.classList.contains("open")));
+    nav.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", (e) => { if (!e.target.closest(".nav")) setOpen(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    setOpen(false);
   }
 
   function setupScroll() {
@@ -463,29 +494,31 @@
 
     if (!("IntersectionObserver" in window)) return;
 
+    // Highlight the menu link of the section in the middle of the screen
     const links = [...document.querySelectorAll(".nav-links a")];
     const spy = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === `#${en.target.id}`));
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === `#${entry.target.id}`));
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
-    document.querySelectorAll("main section[id]:not([hidden])").forEach((s) => spy.observe(s));
+    document.querySelectorAll("main > section:not([hidden])").forEach((s) => spy.observe(s));
 
+    // Fade content in as it scrolls into view (skipped if the visitor prefers less motion)
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     document.documentElement.classList.add("anim");
     const reveal = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        en.target.classList.add("in");
-        reveal.unobserve(en.target);
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("in");
+        reveal.unobserve(entry.target);
       });
     }, { rootMargin: "0px 0px -6% 0px" });
     document.querySelectorAll(".reveal").forEach((n) => reveal.observe(n));
   }
 
-  // Owner shortcut: type "edit" anywhere on the page to open the Portfolio Editor in a new tab.
-  // Only active when the site is opened from your own computer, never on the published site.
+  // Owner shortcut: typing "edit" opens the local content editor. Only works when the
+  // site is opened from the owner's own computer, never on the published site.
   function setupEditShortcut() {
     const local = location.protocol === "file:" || ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
     if (!local) return;
@@ -499,15 +532,18 @@
     });
   }
 
+  /* ---------- Build the page ---------- */
   renderBrand();
   renderHero();
   if (shown.about) renderAbout();
+  if (shown.skills) renderSkills();
   if (shown.projects) renderProjects();
   if (shown.certificates) renderCertificates();
   if (shown.resume) renderResume();
   if (shown.contact) renderContact();
   renderFooter();
   arrangeSections();
+  setupViewer();
   setupTheme();
   setupMenu();
   setupScroll();
