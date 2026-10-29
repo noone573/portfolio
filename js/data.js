@@ -58,7 +58,7 @@ window.PORTFOLIO = {
       ],
       "links": {
         "github": "",
-        "demo": "https://backend-vb5d.onrender.com/",
+        "demo": "",
         "file": ""
       }
     },
