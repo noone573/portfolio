@@ -27,7 +27,8 @@
           <a href="#skills">Skills</a>
           <a href="#projects">Projects</a>
           <a href="#certificates">Certificates</a>
-          <a href="#resume">Education</a>
+          <a href="#education">Education</a>
+          <a href="#resume">Resume</a>
           <a href="#contact">Contact</a>
         </nav>
         <div class="nav-actions">
@@ -78,13 +79,17 @@
       </div>
     </section>
 
-    <section class="section" id="resume">
+    <section class="section" id="education">
       <div class="container">
         <div class="section-head"><div class="section-title"><p class="eyebrow">Education</p><h2>Education</h2></div></div>
-        <div class="resume-grid">
-          <div id="timeline"></div>
-          <div id="resume-viewer"></div>
-        </div>
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </section>
+
+    <section class="section" id="resume">
+      <div class="container">
+        <div class="section-head"><div class="section-title"><p class="eyebrow">Resume</p><h2>My resume</h2></div></div>
+        <div id="resume-card"></div>
       </div>
     </section>
 
@@ -97,12 +102,12 @@
     <div class="container footer-inner" id="footer"></div>
   </footer>
 
-  <!-- Pop-up used to view certificates full size -->
+  <!-- Pop-up used to view certificates and the resume -->
   <dialog class="viewer" id="viewer" aria-labelledby="viewer-title">
     <div class="viewer-inner">
       <div class="viewer-head">
         <div>
-          <h2 id="viewer-title">Certificate</h2>
+          <h2 id="viewer-title">Preview</h2>
           <p class="viewer-sub" id="viewer-sub"></p>
         </div>
         <button class="icon-btn" id="viewer-close" type="button" aria-label="Close preview"></button>

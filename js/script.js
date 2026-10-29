@@ -30,19 +30,27 @@
   const downloadName = has(P.name) ? `${clean(P.name)} - Resume${(resumeFile.match(/\.[a-z0-9]+$/i) || [""])[0]}` : "";
 
   /* ---------- Section settings: labels, headings, order, visibility ---------- */
-  const SECTION_IDS = ["about", "skills", "projects", "certificates", "resume", "contact"];
+  const SECTION_IDS = ["about", "skills", "projects", "certificates", "education", "resume", "contact"];
   const both = education.length > 0 && experience.length > 0;
   const DEFAULTS = {
     about: { nav: "About", title: "About me" },
     skills: { nav: "Skills", title: "Skills & interests" },
     projects: { nav: "Projects", title: "Things I've built" },
     certificates: { nav: "Certificates", title: "Certificates" },
-    resume: {
-      nav: resumeFile ? "Resume" : both ? "Education & Experience" : education.length ? "Education" : experience.length ? "Experience" : "Resume",
-      title: both ? "Education & experience" : education.length ? "Education" : experience.length ? "Experience" : "My resume",
+    education: {
+      nav: both ? "Education & Experience" : experience.length && !education.length ? "Experience" : "Education",
+      title: both ? "Education & experience" : experience.length && !education.length ? "Experience" : "Education",
     },
+    resume: { nav: "Resume", title: "My resume", text: "A one-page summary of my education, skills and projects." },
     contact: { nav: "Contact", title: "Let's work together.", text: "Have an opportunity, a project, or just want to say hi? My inbox is open." },
   };
+
+  // Older settings used "resume" for the education timeline (the resume lived inside it).
+  // Carry those settings over to "education" and add the new standalone resume section after it.
+  function migrate(list) {
+    if (!list.some((s) => s.id === "resume") || list.some((s) => s.id === "education")) return list;
+    return list.flatMap((s) => (s.id === "resume" ? [{ ...s, id: "education" }, { id: "resume" }] : [s]));
+  }
 
   // Saved order first; any section missing from it is slotted in after its default neighbour.
   function sectionOrder(saved) {
@@ -55,7 +63,7 @@
     return order;
   }
 
-  const saved = Array.isArray(S.sections) ? S.sections.filter(Boolean) : [];
+  const saved = migrate(Array.isArray(S.sections) ? S.sections.filter(Boolean) : []);
   const order = sectionOrder(saved);
   const cfg = Object.fromEntries(order.map((id) => {
     const s = saved.find((x) => x.id === id) || {};
@@ -67,7 +75,8 @@
     skills: cfg.skills.show && skillGroups.length > 0,
     projects: cfg.projects.show && projects.length > 0,
     certificates: cfg.certificates.show && certificates.length > 0,
-    resume: cfg.resume.show && (education.length > 0 || experience.length > 0 || !!resumeFile),
+    education: cfg.education.show && (education.length > 0 || experience.length > 0),
+    resume: cfg.resume.show && !!resumeFile,
     contact: cfg.contact.show && (!!email || socials.length > 0),
   };
 
@@ -168,9 +177,6 @@
       el("a", { class: "btn btn-sm", href: path, target: "_blank", rel: "noopener" }, icon("external"), "Open PDF")
     );
   }
-  const pdfView = (path, label) => (canEmbedPdf
-    ? el("object", { data: path, type: "application/pdf", "aria-label": label }, pdfFallback(path))
-    : pdfFallback(path, "Tap below to open the PDF."));
 
   /* ---------- Header & hero ---------- */
   function renderBrand() {
@@ -302,7 +308,7 @@
       const title = clean(c.title) || "Certificate";
       const meta = [c.issuer, c.date].filter(has).map(clean).join(" · ");
       return el("article", { class: "card reveal" },
-        el("button", { class: "thumb cert-thumb", type: "button", "aria-label": `View certificate: ${title}`, onclick: () => openViewer(c, title) }, certThumb(c, title)),
+        el("button", { class: "thumb cert-thumb", type: "button", "aria-label": `View certificate: ${title}`, onclick: () => openViewer({ title, subtitle: meta, file: c.file, alt: `${title} certificate`, thumbnail: c.thumbnail, credentialUrl: c.credentialUrl }) }, certThumb(c, title)),
         el("div", { class: "card-body cert-body" },
           el("h3", {}, title),
           meta && el("p", { class: "cert-meta" }, icon("award"), meta),
@@ -312,7 +318,7 @@
     }));
   }
 
-  /* ---------- Education / Experience / Resume ---------- */
+  /* ---------- Education / Experience ---------- */
   // When both lists are shown each gets an <h3> label and entries use <h4>;
   // otherwise the section <h2> already names the list, so entries use <h3>.
   function timeline(label, iconName, items) {
@@ -333,32 +339,31 @@
     );
   }
 
+  function renderEducation() {
+    $("#timeline").append(...[timeline("Education", "school", education), timeline("Experience", "briefcase", experience)].filter(Boolean));
+  }
+
+  /* ---------- Resume ---------- */
+  // A compact card. The PDF is only shown when the visitor clicks "View resume".
   function renderResume() {
-    const grid = $("#resume .resume-grid");
-    const groups = [timeline("Education", "school", education), timeline("Experience", "briefcase", experience)].filter(Boolean);
+    const title = has(P.name) ? `${clean(P.name)}'s resume` : "Resume";
+    // Phones can't preview a PDF inside the page, so there "View resume" opens the file in a new tab.
+    const viewButton = isPdf(resumeFile) && !canEmbedPdf
+      ? el("a", { class: "btn btn-primary resume-dl", href: resumeFile, target: "_blank", rel: "noopener" }, icon("external"), "View resume")
+      : el("button", { class: "btn btn-primary resume-dl", type: "button", onclick: () => openViewer({ title, subtitle: fileName(resumeFile), file: resumeFile, download: true }) }, icon("file"), "View resume");
 
-    if (groups.length) $("#timeline").append(...groups);
-    else { $("#timeline").remove(); grid.classList.add("single"); }
-
-    if (!resumeFile) { $("#resume-viewer").remove(); grid.classList.add("single"); return; }
-
-    $("#resume-viewer").append(el("div", { class: "doc reveal" },
-      el("div", { class: "doc-bar" },
-        el("p", { class: "doc-name" }, icon("file"), el("span", {}, fileName(resumeFile))),
-        el("a", { class: "btn btn-sm", href: resumeFile, target: "_blank", rel: "noopener" }, icon("external"), "Open"),
-        el("a", { class: "btn btn-sm btn-primary", href: resumeFile, download: downloadName }, icon("download"), "Download")
-      ),
-      isPdf(resumeFile) ? pdfView(`${resumeFile}#view=FitH`, "Resume") : el("div", { class: "viewer-body" }, imageOr(resumeFile, "Resume", "CV"))
+    $("#resume-card").append(el("div", { class: "resume-card reveal" },
+      el("span", { class: "resume-icon", html: ICONS.file }),
+      el("div", { class: "resume-text" }, el("h3", {}, title), cfg.resume.text && el("p", {}, cfg.resume.text)),
+      el("div", { class: "resume-actions" }, viewButton, resumeButton("Download"))
     ));
 
-    // On the live site, hide the resume if its file is missing instead of showing a broken viewer.
+    // On the live site, hide the resume if its file is missing instead of offering a broken link.
     if (/^https?:/.test(location.protocol)) {
       fetch(resumeFile, { method: "HEAD" }).then((res) => {
         if (res.ok) return;
         document.querySelectorAll(".resume-dl").forEach((a) => a.remove());
-        $("#resume-viewer")?.remove();
-        grid.classList.add("single");
-        if (!groups.length) hideSection("resume");
+        hideSection("resume");
       }).catch(() => {});
     }
   }
@@ -422,26 +427,29 @@
     });
   }
 
-  /* ---------- Certificate viewer (pop-up) ---------- */
+  /* ---------- Viewer pop-up (certificates and resume) ---------- */
   const dialog = $("#viewer");
-  function openViewer(c, title) {
+  // doc = { title, subtitle, file, alt?, thumbnail?, credentialUrl?, download? }
+  function openViewer(doc) {
     const body = $("#viewer-body");
     const actions = $("#viewer-actions");
-    $("#viewer-title").textContent = title;
-    $("#viewer-sub").textContent = [c.issuer, c.date].filter(has).map(clean).join(" · ");
+    const alt = doc.alt || doc.title;
+    $("#viewer-title").textContent = doc.title;
+    $("#viewer-sub").textContent = doc.subtitle || "";
     body.replaceChildren();
     actions.replaceChildren();
 
-    if (!c.file) body.append(el("p", { class: "doc-fallback" }, "No file attached."));
-    else if (!isPdf(c.file)) body.append(imageOr(c.file, `${title} certificate`, title));
-    else if (canEmbedPdf) body.append(pdfView(c.file, `${title} certificate`));
-    else body.append(c.thumbnail ? imageOr(c.thumbnail, `Preview of the ${title} certificate`, title) : pdfFallback(c.file, "Tap below to open the PDF."));
+    if (!doc.file) body.append(el("p", { class: "doc-fallback" }, "No file attached."));
+    else if (!isPdf(doc.file)) body.append(imageOr(doc.file, alt, doc.title));
+    else if (canEmbedPdf) body.append(el("object", { data: `${doc.file}#view=FitH`, type: "application/pdf", "aria-label": alt }, pdfFallback(doc.file)));
+    else body.append(doc.thumbnail ? imageOr(doc.thumbnail, `Preview of ${alt}`, doc.title) : pdfFallback(doc.file, "Tap below to open the PDF."));
 
-    if (c.file) actions.append(el("a", { class: "btn btn-sm", href: c.file, target: "_blank", rel: "noopener" }, icon("external"), isPdf(c.file) ? "Open PDF" : "Open file"));
-    if (has(c.credentialUrl)) actions.append(el("a", { class: "btn btn-sm btn-primary", href: c.credentialUrl, ...newTab(c.credentialUrl) }, icon("check"), "Verify credential"));
+    if (doc.file) actions.append(el("a", { class: "btn btn-sm", href: doc.file, target: "_blank", rel: "noopener" }, icon("external"), isPdf(doc.file) ? "Open PDF" : "Open file"));
+    if (doc.download) actions.append(el("a", { class: "btn btn-sm btn-primary", href: doc.file, download: downloadName }, icon("download"), "Download"));
+    if (has(doc.credentialUrl)) actions.append(el("a", { class: "btn btn-sm btn-primary", href: doc.credentialUrl, ...newTab(doc.credentialUrl) }, icon("check"), "Verify credential"));
 
     if (typeof dialog.showModal === "function") dialog.showModal();
-    else if (c.file) window.open(c.file, "_blank", "noopener");
+    else if (doc.file) window.open(doc.file, "_blank", "noopener");
   }
 
   function setupViewer() {
@@ -539,6 +547,7 @@
   if (shown.skills) renderSkills();
   if (shown.projects) renderProjects();
   if (shown.certificates) renderCertificates();
+  if (shown.education) renderEducation();
   if (shown.resume) renderResume();
   if (shown.contact) renderContact();
   renderFooter();

@@ -98,7 +98,7 @@ window.PORTFOLIO = {
     }
   ],
   "resume": {
-    "file": "",
+    "file": "assets/resume/resume.pdf",
     "education": [
       {
         "title": " Bachelor of Science in Computer Science",
@@ -110,7 +110,7 @@ window.PORTFOLIO = {
     "experience": []
   },
   "site": {
-    "brand": "",
+    "brand": "Web Portfolio",
     "sections": [
       {
         "id": "about",
