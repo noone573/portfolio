@@ -1,9 +1,3 @@
-/* ==========================================================================
-   Portfolio renderer
-   Builds the page from the content in js/data.js. Sections with no content are
-   hidden automatically. Menu labels, headings, order and visibility come from
-   the optional "site" settings in data.js.
-   ========================================================================== */
 (() => {
   "use strict";
 
@@ -13,7 +7,6 @@
   const S = D.site || {};
   const $ = (sel, root = document) => root.querySelector(sel);
 
-  /* ---------- Content (empty entries are dropped) ---------- */
   const has = (v) => (typeof v === "string" ? v.trim() !== "" : Array.isArray(v) ? v.length > 0 : v != null);
   const clean = (v) => (has(v) ? String(v).trim() : "");
   const about = [].concat(D.about || []).filter(has);
@@ -29,7 +22,7 @@
   const resumeFile = clean(R.file);
   const downloadName = has(P.name) ? `${clean(P.name)} - Resume${(resumeFile.match(/\.[a-z0-9]+$/i) || [""])[0]}` : "";
 
-  /* ---------- Section settings: labels, headings, order, visibility ---------- */
+
   const SECTION_IDS = ["about", "skills", "projects", "certificates", "education", "resume", "contact"];
   const both = education.length > 0 && experience.length > 0;
   const DEFAULTS = {
@@ -45,14 +38,11 @@
     contact: { nav: "Contact", title: "Let's work together.", text: "Have an opportunity, a project, or just want to say hi? My inbox is open." },
   };
 
-  // Older settings used "resume" for the education timeline (the resume lived inside it).
-  // Carry those settings over to "education" and add the new standalone resume section after it.
   function migrate(list) {
     if (!list.some((s) => s.id === "resume") || list.some((s) => s.id === "education")) return list;
     return list.flatMap((s) => (s.id === "resume" ? [{ ...s, id: "education" }, { id: "resume" }] : [s]));
   }
 
-  // Saved order first; any section missing from it is slotted in after its default neighbour.
   function sectionOrder(saved) {
     const order = saved.map((s) => s.id).filter((id, i, all) => SECTION_IDS.includes(id) && all.indexOf(id) === i);
     SECTION_IDS.forEach((id, i) => {
@@ -80,10 +70,8 @@
     contact: cfg.contact.show && (!!email || socials.length > 0),
   };
 
-  // Phones and some browsers can't show PDFs inside the page; offer an "Open PDF" button there instead.
   const canEmbedPdf = navigator.pdfViewerEnabled !== false && !matchMedia("(pointer: coarse)").matches;
 
-  /* ---------- Icons (inline SVG) ---------- */
   const stroke = (paths) =>
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
   const ICONS = {
@@ -112,14 +100,12 @@
     spark: stroke('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/>'),
   };
 
-  /* ---------- DOM helpers ---------- */
-  // el("a", { class: "btn", href: "#x" }, "Label") → <a class="btn" href="#x">Label</a>
   function el(tag, props = {}, ...kids) {
     const node = document.createElement(tag);
     for (const [key, value] of Object.entries(props)) {
       if (value == null || value === false) continue;
       if (key === "class") node.className = value;
-      else if (key === "html") node.innerHTML = value; // only used for the trusted icon markup above
+      else if (key === "html") node.innerHTML = value;
       else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
       else node.setAttribute(key, value === true ? "" : value);
     }
@@ -138,7 +124,7 @@
     const words = String(text || "?").replace(/[^\p{L}\p{N}\s]/gu, "").trim().split(/\s+/);
     return (words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2)).toUpperCase();
   }
-  // Placeholder hue in the teal → blue → violet range so it matches the accent colors
+
   function hue(text) {
     let h = 0;
     for (const ch of String(text)) h = (h * 31 + ch.codePointAt(0)) % 997;
@@ -146,7 +132,6 @@
   }
   const placeholder = (text) => el("div", { class: "ph", style: `--h:${hue(text)}`, "aria-hidden": "true" }, el("span", {}, initials(text)));
 
-  // An <img> that swaps itself for a placeholder if the file is missing.
   function imageOr(src, alt, fallbackText) {
     if (!src) return placeholder(fallbackText);
     const img = el("img", { src, alt, loading: "lazy", decoding: "async" });
@@ -169,7 +154,6 @@
   const resumeButton = (label) =>
     resumeFile && el("a", { class: "btn resume-dl", href: resumeFile, download: downloadName }, icon("download"), label);
 
-  // "Open PDF" message for browsers that can't show a PDF inside the page
   function pdfFallback(path, text = "This browser can't preview the PDF here.") {
     return el("div", { class: "doc-fallback" },
       icon("file"),
@@ -178,7 +162,6 @@
     );
   }
 
-  /* ---------- Header & hero ---------- */
   function renderBrand() {
     const name = clean(S.brand) || clean(P.name) || "Portfolio";
     document.title = P.name ? `${clean(P.name)} | Portfolio` : "Portfolio";
@@ -220,7 +203,6 @@
     ));
   }
 
-  /* ---------- About & Skills ---------- */
   function renderAbout() {
     const latest = education[0];
     const facts = [

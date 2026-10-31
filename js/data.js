@@ -1,6 +1,3 @@
-/* Portfolio content.
-   Written by the Portfolio Editor (a local tool, not part of the site) whenever content is saved.
-   Empty sections are hidden on the site automatically. */
 window.PORTFOLIO = {
   "profile": {
     "name": "Juniel",
@@ -14,6 +11,10 @@ window.PORTFOLIO = {
       {
         "label": "GitHub",
         "url": "https://github.com/noone573"
+      },
+      {
+        "label": "Facebook",
+        "url": "https://facebook.com/junielvillablanca"
       }
     ]
   },
@@ -26,8 +27,7 @@ window.PORTFOLIO = {
       "items": [
         "Python",
         "JavaScript",
-        "HTML & CSS",
-        "Java"
+        "HTML & CSS"
       ]
     },
     {
@@ -110,7 +110,7 @@ window.PORTFOLIO = {
     "experience": []
   },
   "site": {
-    "brand": "Web Portfolio",
+      "brand": "Juniel Villablanca",
     "sections": [
       {
         "id": "about",
@@ -137,10 +137,17 @@ window.PORTFOLIO = {
         "title": ""
       },
       {
-        "id": "resume",
+        "id": "education",
         "show": true,
         "nav": "",
         "title": ""
+      },
+      {
+        "id": "resume",
+        "show": true,
+        "nav": "",
+        "title": "",
+        "text": ""
       },
       {
         "id": "contact",
