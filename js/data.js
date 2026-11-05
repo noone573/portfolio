@@ -4,7 +4,7 @@
 window.PORTFOLIO = {
   "profile": {
     "name": "Juniel",
-    "role": "Student Developer",
+    "role": "Web Developer",
     "tagline": "I build web apps, data tools and embedded systems, from Django backends",
     "location": "Philippines",
     "status": "Open to opportunities",
