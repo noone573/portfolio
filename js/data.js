@@ -50,20 +50,6 @@ window.PORTFOLIO = {
   ],
   "projects": [
     {
-      "title": "no name",
-      "year": "2026",
-      "description": "a small game ",
-      "image": "assets/projects/mini-project-mw2wrp88.png",
-      "tags": [
-        "Javascript"
-      ],
-      "links": {
-        "github": "",
-        "demo": "https://game-delta-lemon-75.vercel.app/",
-        "file": ""
-      }
-    },
-    {
       "title": "SRMS",
       "year": "2026, Thesis ",
       "description": "it is Scholarship Record Management System for BiPSU, it is use to help the VPSEA office to manage scholars and also help Students by using a rule based recommender which recommends the student if they are eligible to a scholarship",
@@ -76,6 +62,20 @@ window.PORTFOLIO = {
       "links": {
         "github": "",
         "demo": "",
+        "file": ""
+      }
+    },
+    {
+      "title": "Chicken Fight",
+      "year": "2026",
+      "description": "A small mini-game project designed to enhance my knowledge and practical skills in JavaScript. The game is a 1v1 arcade-style fighting game featuring barnyard animals, with chickens as the first and only playable characters for now. The project aims to provide hands-on experience in JavaScript through implementing game mechanics, character movements, combat systems, animations, and player interactions. Future updates may introduce additional barnyard animals, each with unique abilities and fighting styles.",
+      "image": "assets/projects/mini-project-mw2wrp88.png",
+      "tags": [
+        "Javascript"
+      ],
+      "links": {
+        "github": "",
+        "demo": "https://game-delta-lemon-75.vercel.app/",
         "file": ""
       }
     },
