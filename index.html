@@ -7,11 +7,16 @@
   <meta name="description" content="Personal portfolio: about me, skills, projects, certificates and education.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=Press+Start+2P&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
   <script>
     // Apply the saved light/dark choice before the page paints to avoid a flash
     try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <script>
+    // Game theme is on by default; applied before paint so there is no flash
+    try { if ((JSON.parse(localStorage.getItem("game")) || {}).on !== false) document.documentElement.classList.add("game"); } catch (e) { document.documentElement.classList.add("game"); }
   </script>
 </head>
 <body>
@@ -122,5 +127,6 @@
 
   <script src="js/data.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>

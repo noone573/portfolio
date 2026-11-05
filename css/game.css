@@ -1,0 +1,126 @@
+/* ==========================================================================
+   Game theme layer. Load AFTER style.css.
+   Everything is scoped to html.game, so turning "game mode" off (the gamepad
+   button in the header) brings back the original design untouched.
+   ========================================================================== */
+
+html.game {
+  --pixel: "Press Start 2P", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --edge: color-mix(in srgb, var(--accent) 50%, #000);
+}
+html:not(.game) :is(.world, .game-layer, .loot-layer, .ground-fixed, .chick, .ticker, .hud) { display: none !important; }
+
+/* ---------- World: fills every blank area behind the content ---------- */
+.world {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle 1.1px at 12px 12px, var(--grid) 98%, transparent) 0 0 / 24px 24px;
+}
+.world::before { /* twinkling pixel stars */
+  content: ""; position: absolute; inset: 0; opacity: .35; animation: twinkle 4s steps(2) infinite;
+  background:
+    radial-gradient(1.6px 1.6px at 20px 30px, var(--accent) 60%, transparent) 0 0 / 157px 131px,
+    radial-gradient(1.6px 1.6px at 90px 70px, var(--accent-2) 60%, transparent) 0 0 / 211px 173px,
+    radial-gradient(1.2px 1.2px at 50px 110px, var(--text) 60%, transparent) 0 0 / 263px 197px;
+}
+.world::after { /* distant pixel mountains */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 14px; height: 120px; opacity: .1;
+  background: var(--mtn) repeat-x left bottom / 960px 120px; image-rendering: pixelated;
+}
+
+/* Fixed ground strip along the bottom of the screen */
+.ground-fixed {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 14px; z-index: 45; pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, #4ade80 0 8px, #22c55e 8px 16px) top / 100% 6px no-repeat,
+    repeating-linear-gradient(90deg, #8a4a1a 0 6px, #7c3f12 6px 12px) bottom / 100% 8px no-repeat;
+}
+html.game body { padding-bottom: 14px; }
+
+/* ---------- Page layers (decor behind content, loot above it) ---------- */
+.game-layer, .loot-layer { position: absolute; left: 0; top: 0; width: 100%; overflow: hidden; pointer-events: none; }
+.game-layer { z-index: 0; }
+.loot-layer { z-index: 40; }
+html.game main > section { position: relative; }
+html.game .container { position: relative; z-index: 1; }
+html.game main > .section:nth-of-type(even) { background: color-mix(in srgb, var(--accent) 3.5%, transparent); }
+
+.deco, .loot-item { position: absolute; background: var(--img) center / 100% 100% no-repeat; image-rendering: pixelated; }
+.cloud {
+  background: var(--muted); opacity: .16; animation: drift 18s ease-in-out infinite alternate;
+  -webkit-mask: var(--img) center / 100% 100% no-repeat; mask: var(--img) center / 100% 100% no-repeat;
+}
+.game-divider {
+  position: absolute; left: 0; right: 0; height: 4px; opacity: .55;
+  background: repeating-linear-gradient(90deg, var(--edge) 0 8px, transparent 8px 16px);
+}
+.loot-item {
+  pointer-events: auto; cursor: pointer; animation: bob 2.2s steps(4) infinite; animation-delay: var(--d, 0s);
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, .55));
+}
+.loot-item::after { content: ""; position: absolute; inset: -12px; } /* bigger tap target */
+.spark { position: fixed; width: 6px; height: 6px; background: #fbbf24; z-index: 80; pointer-events: none; }
+
+/* ---------- Skill ticker under the hero ---------- */
+.ticker {
+  overflow: hidden; border-block: 3px solid var(--edge); color: #04201c;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  font: 10px/1 var(--pixel); text-transform: uppercase; position: relative; z-index: 1;
+}
+.ticker-track { display: flex; width: max-content; animation: tick 40s linear infinite; }
+.ticker span { padding: 14px 18px; white-space: nowrap; }
+.ticker span::before { content: "\25C6"; margin-right: 36px; opacity: .7; }
+
+/* ---------- Chicken that runs along the ground as you scroll ---------- */
+.chick {
+  position: fixed; left: 0; bottom: 11px; width: 48px; height: 48px; z-index: 46; cursor: pointer;
+  background: var(--c1) center / 100% 100% no-repeat; image-rendering: pixelated;
+  transform: translateX(var(--x, 0)) scaleX(var(--dir, 1)); transition: transform .12s linear;
+}
+.chick.f2 { background-image: var(--c2); }
+.chick.jump { animation: jump .45s cubic-bezier(.3, .7, .4, 1); }
+
+/* ---------- Header HUD ---------- */
+.hud {
+  display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px;
+  border: 2px solid var(--edge); border-radius: 12px; background: var(--surface);
+  font: 8px/1 var(--pixel); color: var(--text); white-space: nowrap;
+}
+.hud .lv { color: var(--accent-strong); }
+.hud-coin { width: 12px; height: 12px; background: var(--coin) center / 100% 100% no-repeat; image-rendering: pixelated; }
+.hud.bump { animation: bump .3s; }
+.game-toggle[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+@media (max-width: 600px) { .hud .lv { display: none; } }
+
+/* ---------- Pixel look for the existing components ---------- */
+html.game .section-title h2 { font-family: var(--pixel); font-size: clamp(15px, 2.3vw, 24px); line-height: 1.5; letter-spacing: 0; }
+html.game .eyebrow { font-family: var(--pixel); font-size: 9px; }
+html.game :is(.card, .skill-card, .tl-card, .resume-card, .facts, .contact-card) {
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: 14px; box-shadow: 0 4px 0 var(--edge);
+}
+html.game .btn { border: 2px solid var(--edge); border-radius: 12px; box-shadow: 0 4px 0 var(--edge); transition: transform .08s, box-shadow .08s; }
+html.game .btn:hover { transform: translateY(-1px); }
+html.game .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--edge); }
+html.game .tag { border-radius: 6px; font-family: var(--pixel); font-size: 8px; line-height: 1.6; }
+html.game .site-footer { border-top: 4px solid var(--edge); }
+
+/* ---------- Quest complete message ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 84px; z-index: 90; display: grid; gap: 10px; justify-items: center; text-align: center;
+  padding: 18px 22px; width: min(92vw, 420px); background: var(--surface); color: var(--text);
+  border: 3px solid var(--edge); border-radius: 14px; box-shadow: 0 6px 0 var(--edge); font: 10px/1.7 var(--pixel);
+  opacity: 0; transform: translate(-50%, 20px); transition: opacity .3s, transform .3s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast strong { color: var(--accent-strong); }
+
+@keyframes twinkle { 50% { opacity: .15; } }
+@keyframes drift { to { translate: 60px 0; } }
+@keyframes bob { 50% { translate: 0 -6px; } }
+@keyframes bump { 50% { transform: scale(1.12); } }
+@keyframes tick { to { transform: translateX(-50%); } }
+@keyframes jump { 50% { translate: 0 -46px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .world::before, .loot-item, .cloud, .ticker-track, .chick, .hud { animation: none !important; transition: none !important; }
+}
