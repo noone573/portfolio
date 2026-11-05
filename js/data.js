@@ -1,3 +1,6 @@
+/* Portfolio content.
+   Written by the Portfolio Editor (a local tool, not part of the site) whenever content is saved.
+   Empty sections are hidden on the site automatically. */
 window.PORTFOLIO = {
   "profile": {
     "name": "Juniel",
@@ -46,6 +49,20 @@ window.PORTFOLIO = {
     }
   ],
   "projects": [
+    {
+      "title": "no name",
+      "year": "2026",
+      "description": "a small game ",
+      "image": "assets/projects/mini-project-mw2wrp88.png",
+      "tags": [
+        "Javascript"
+      ],
+      "links": {
+        "github": "",
+        "demo": "https://game-delta-lemon-75.vercel.app/",
+        "file": ""
+      }
+    },
     {
       "title": "SRMS",
       "year": "2026, Thesis ",
@@ -110,7 +127,7 @@ window.PORTFOLIO = {
     "experience": []
   },
   "site": {
-      "brand": "Juniel Villablanca",
+    "brand": "Juniel Villablanca",
     "sections": [
       {
         "id": "about",
