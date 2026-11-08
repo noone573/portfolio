@@ -1,14 +1,12 @@
 /* ==========================================================================
    Game theme layer. Load AFTER style.css.
-   Everything is scoped to html.game, so turning "game mode" off (the gamepad
-   button in the header) brings back the original design untouched.
+   Everything is scoped to html.game (set on the <html> tag in index.html).
    ========================================================================== */
 
 html.game {
   --pixel: "Press Start 2P", ui-monospace, SFMono-Regular, Menlo, monospace;
   --edge: color-mix(in srgb, var(--accent) 50%, #000);
 }
-html:not(.game) :is(.world, .game-layer, .loot-layer, .ground-fixed, .chick, .ticker, .hud) { display: none !important; }
 
 /* ---------- World: fills every blank area behind the content ---------- */
 .world {
@@ -88,7 +86,6 @@ html.game main > .section:nth-of-type(even) { background: color-mix(in srgb, var
 .hud .lv { color: var(--accent-strong); }
 .hud-coin { width: 12px; height: 12px; background: var(--coin) center / 100% 100% no-repeat; image-rendering: pixelated; }
 .hud.bump { animation: bump .3s; }
-.game-toggle[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
 @media (max-width: 600px) { .hud .lv { display: none; } }
 
 /* ---------- Pixel look for the existing components ---------- */

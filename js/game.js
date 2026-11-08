@@ -1,5 +1,5 @@
 /* Game theme layer. Load AFTER script.js.
-   Adds: header HUD + game-mode toggle, 16 collectibles hidden around the page, pixel clouds / bushes /
+   Adds: header HUD, 16 collectibles hidden around the page, pixel clouds / bushes /
    dividers that fill every section's empty space, a skill ticker, and a chicken that runs as you scroll. */
 (() => {
   "use strict";
@@ -12,7 +12,7 @@
 
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
-  const state = { on: saved.on !== false, got: Array.isArray(saved.got) ? saved.got : [] };
+  const state = { got: Array.isArray(saved.got) ? saved.got : [] };
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
 
   const mk = (cls, tag = "div") => { const n = document.createElement(tag); n.className = cls; return n; };
@@ -65,15 +65,11 @@
   chick.style.setProperty("--c2", SP.chick2.url);
   document.body.append(world, layer, loot, ground, chick);
 
-  /* ---------- Header: HUD + game-mode toggle ---------- */
+  /* ---------- Header: HUD ---------- */
   const hud = mk("hud");
   hud.innerHTML = '<span class="lv"></span><span class="hud-coin"></span><span class="count"></span>';
   hud.title = `Collect all ${TOTAL} items hidden around the page`;
-  const toggle = mk("icon-btn game-toggle", "button");
-  toggle.type = "button";
-  toggle.setAttribute("aria-label", "Toggle game mode");
-  toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="4"/><path d="M7 10v5M4.5 12.5h5"/><circle cx="16" cy="11.5" r=".6"/><circle cx="18.5" cy="14" r=".6"/></svg>';
-  document.querySelector(".nav-actions")?.prepend(hud, toggle);
+  document.querySelector(".nav-actions")?.prepend(hud);
 
   const paintHud = () => {
     const n = state.got.length;
@@ -148,7 +144,6 @@
   }
 
   function layout() {
-    if (!state.on) return;
     layer.style.height = loot.style.height = "0px";
     const W = root.clientWidth, H = root.scrollHeight;
     layer.style.height = loot.style.height = H + "px";
@@ -201,14 +196,6 @@
   addEventListener("resize", run);
   setInterval(() => chick.classList.toggle("f2", performance.now() - lastMove < 160 && !chick.classList.contains("f2")), 130);
 
-  /* ---------- Game mode on/off ---------- */
-  function apply() {
-    root.classList.toggle("game", state.on);
-    toggle.setAttribute("aria-pressed", String(state.on));
-    toggle.title = state.on ? "Game mode: on" : "Game mode: off";
-    if (state.on) requestAnimationFrame(layout);
-  }
-  toggle.addEventListener("click", () => { state.on = !state.on; save(); apply(); });
 
   let timer;
   const later = () => { clearTimeout(timer); timer = setTimeout(layout, 150); };
@@ -218,5 +205,5 @@
 
   paintHud();
   run();
-  apply();
+  requestAnimationFrame(layout);
 })();

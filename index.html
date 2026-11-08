@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="game">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,10 +13,6 @@
   <script>
     // Apply the saved light/dark choice before the page paints to avoid a flash
     try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-  </script>
-  <script>
-    // Game theme is on by default; applied before paint so there is no flash
-    try { if ((JSON.parse(localStorage.getItem("game")) || {}).on !== false) document.documentElement.classList.add("game"); } catch (e) { document.documentElement.classList.add("game"); }
   </script>
 </head>
 <body>
