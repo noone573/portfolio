@@ -20,7 +20,6 @@
   const socials = (P.socials || []).filter((s) => s && has(s.url));
   const email = clean(P.email);
   const resumeFile = clean(R.file);
-  const downloadName = has(P.name) ? `${clean(P.name)} - Resume${(resumeFile.match(/\.[a-z0-9]+$/i) || [""])[0]}` : "";
 
 
   const SECTION_IDS = ["about", "skills", "projects", "certificates", "education", "resume", "contact"];
@@ -152,9 +151,6 @@
     );
   }
 
-  const resumeButton = (label) =>
-    resumeFile && el("a", { class: "btn resume-dl", href: resumeFile, download: downloadName }, icon("download"), label);
-
   function pdfFallback(path, text = "This browser can't preview the PDF here.") {
     return el("div", { class: "doc-fallback" },
       icon("file"),
@@ -175,7 +171,7 @@
   function renderHero() {
     const hero = $("#hero");
     const secondButton = resumeFile && shown.resume
-      ? resumeButton("Download resume")
+      ? el("a", { class: "btn", href: "#resume" }, icon("file"), "View resume")
       : shown.contact && el("a", { class: "btn", href: "#contact" }, icon("mail"), "Contact me");
     const badgeOnPhoto = has(P.photo) && has(P.location);
 
@@ -333,12 +329,12 @@
     // Phones can't preview a PDF inside the page, so there "View resume" opens the file in a new tab.
     const viewButton = isPdf(resumeFile) && !canEmbedPdf
       ? el("a", { class: "btn btn-primary resume-dl", href: resumeFile, target: "_blank", rel: "noopener" }, icon("external"), "View resume")
-      : el("button", { class: "btn btn-primary resume-dl", type: "button", onclick: () => openViewer({ title, subtitle: fileName(resumeFile), file: resumeFile, download: true }) }, icon("file"), "View resume");
+      : el("button", { class: "btn btn-primary resume-dl", type: "button", onclick: () => openViewer({ title, subtitle: fileName(resumeFile), file: resumeFile }) }, icon("file"), "View resume");
 
     $("#resume-card").append(el("div", { class: "resume-card reveal" },
       el("span", { class: "resume-icon", html: ICONS.file }),
       el("div", { class: "resume-text" }, el("h3", {}, title), cfg.resume.text && el("p", {}, cfg.resume.text)),
-      el("div", { class: "resume-actions" }, viewButton, resumeButton("Download"))
+      el("div", { class: "resume-actions" }, viewButton)
     ));
 
     // On the live site, hide the resume if its file is missing instead of offering a broken link.
@@ -371,8 +367,7 @@
         email && el("a", { class: "contact-email", href: `mailto:${email}` }, email),
         el("div", { class: "cta" },
           email && el("a", { class: "btn btn-primary", href: `mailto:${email}` }, icon("mail"), "Email me"),
-          copyButton,
-          shown.resume && resumeButton("Resume")
+          copyButton
         ),
         socials.length > 0 && socialLinks()
       )
@@ -428,7 +423,6 @@
     else body.append(doc.thumbnail ? imageOr(doc.thumbnail, `Preview of ${alt}`, doc.title) : pdfFallback(doc.file, "Tap below to open the PDF."));
 
     if (doc.file) actions.append(el("a", { class: "btn btn-sm", href: doc.file, target: "_blank", rel: "noopener" }, icon("external"), isPdf(doc.file) ? "Open PDF" : "Open file"));
-    if (doc.download) actions.append(el("a", { class: "btn btn-sm btn-primary", href: doc.file, download: downloadName }, icon("download"), "Download"));
     if (has(doc.credentialUrl)) actions.append(el("a", { class: "btn btn-sm btn-primary", href: doc.credentialUrl, ...newTab(doc.credentialUrl) }, icon("check"), "Verify credential"));
 
     if (typeof dialog.showModal === "function") dialog.showModal();
