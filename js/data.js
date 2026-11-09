@@ -22,7 +22,7 @@ window.PORTFOLIO = {
     ]
   },
   "about": [
-    "I'm still currently taking my 4th year as a Computer Science Student, I'm mostly focusing on my thesis right now, but after that i will focus in constantly improving myself by learning, creating more projects and gaining more certificates to improve my resume."
+    "I am currently a 4th year Bachelor of Science in Computer Science student, primarily focused on completing my thesis. After graduation, I plan to dedicate more time to personal and professional growth by continuously expanding my knowledge, learning new technologies, developing more projects, and earning relevant certifications. My goal is to strengthen my technical skills, gain valuable experience, and build a more competitive resume as I prepare for future opportunities in the field of web development."
   ],
   "skills": [
     {
@@ -62,20 +62,6 @@ window.PORTFOLIO = {
       "links": {
         "github": "",
         "demo": "",
-        "file": ""
-      }
-    },
-    {
-      "title": "Chicken Fight",
-      "year": "2026",
-      "description": "A small mini-game project designed to enhance my knowledge and practical skills in JavaScript. The game is a 1v1 arcade-style fighting game featuring barnyard animals, with chickens as the first and only playable characters for now. The project aims to provide hands-on experience in JavaScript through implementing game mechanics, character movements, combat systems, animations, and player interactions. Future updates may introduce additional barnyard animals, each with unique abilities and fighting styles.",
-      "image": "assets/projects/mini-project-mw2wrp88.png",
-      "tags": [
-        "Javascript"
-      ],
-      "links": {
-        "github": "",
-        "demo": "https://game-delta-lemon-75.vercel.app/",
         "file": ""
       }
     },
