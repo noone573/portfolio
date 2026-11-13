@@ -121,8 +121,45 @@
 
   <noscript><p class="container">This portfolio needs JavaScript enabled to show its content.</p></noscript>
 
+  <!-- Content (written by the Portfolio Editor) -->
   <script src="js/data.js"></script>
+
+  <!-- Shared helpers, icons and the cleaned-up content. Order matters: each file uses the ones above it. -->
+  <script src="js/core/helpers.js"></script>
+  <script src="js/core/icons.js"></script>
+  <script src="js/core/content.js"></script>
+  <script src="js/core/components.js"></script>
+
+  <!-- One file per page section -->
+  <script src="js/sections/hero.js"></script>
+  <script src="js/sections/about.js"></script>
+  <script src="js/sections/skills.js"></script>
+  <script src="js/sections/projects.js"></script>
+  <script src="js/sections/certificates.js"></script>
+  <script src="js/sections/education.js"></script>
+  <script src="js/sections/resume.js"></script>
+  <script src="js/sections/contact.js"></script>
+
+  <!-- Page behaviour -->
+  <script src="js/ui/viewer.js"></script>
+  <script src="js/ui/theme.js"></script>
+  <script src="js/ui/menu.js"></script>
+  <script src="js/ui/scroll.js"></script>
+  <script src="js/ui/motion.js"></script>
+  <script src="js/ui/edit-shortcut.js"></script>
+
+  <!-- Builds the page from the pieces above -->
   <script src="js/script.js"></script>
-  <script src="js/game.js"></script>
+
+  <!-- Game theme layer (decorates the finished page, so it loads last) -->
+  <script src="js/game/state.js"></script>
+  <script src="js/game/sprites.js"></script>
+  <script src="js/game/layers.js"></script>
+  <script src="js/game/hud.js"></script>
+  <script src="js/game/effects.js"></script>
+  <script src="js/game/ticker.js"></script>
+  <script src="js/game/layout.js"></script>
+  <script src="js/game/chicken.js"></script>
+  <script src="js/game/start.js"></script>
 </body>
 </html>

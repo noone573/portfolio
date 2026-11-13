@@ -5,7 +5,7 @@ window.PORTFOLIO = {
   "profile": {
     "name": "Juniel",
     "role": "Web Developer",
-    "tagline": "I enjoy exploring new possibilities, learning along the way, and creating things that make a difference.\n\nHave an idea or something you'd like to build? Feel free to contact me! I'm always open to new opportunities, collaborations, and exciting projects. Let's create something awesome together!",
+    "tagline": "I enjoy exploring new possibilities, learning along the way, and creating things that make a difference.\n\nHave an idea or something you'd like to build? Feel free to contact me! ",
     "location": "Philippines",
     "status": "Open to opportunities",
     "email": "junielvillablanca2005@gmail.com",
