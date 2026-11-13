@@ -43,8 +43,7 @@ window.PORTFOLIO = {
     {
       "group": "Interests",
       "items": [
-        "Web development",
-        "Game development"
+        "Web development"
       ]
     }
   ],
@@ -52,7 +51,7 @@ window.PORTFOLIO = {
     {
       "title": "SRMS",
       "year": "2026, Thesis ",
-      "description": "it is Scholarship Record Management System for BiPSU, it is use to help the VPSEA office to manage scholars and also help Students by using a rule based recommender which recommends the student if they are eligible to a scholarship",
+      "description": "It is a group thesis project, which is a Scholarship Record Management System, it is use to help the VPSEA office to manage scholars and also help Students by using a rule based recommender which recommends the student if they are eligible to a scholarship",
       "image": "assets/projects/project-mv85j0mv.png",
       "tags": [
         "Python",
@@ -61,7 +60,7 @@ window.PORTFOLIO = {
       ],
       "links": {
         "github": "",
-        "demo": "",
+        "demo": "https://noone573.github.io/srms-demo/index.html",
         "file": ""
       }
     },
