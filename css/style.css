@@ -373,7 +373,7 @@ svg { display: block; }
   animation: blink 1s steps(1) infinite;
 }
 .role.done .caret { animation: none; opacity: 0; transition: opacity .5s; }
-.tagline { max-width: 54ch; margin-top: 12px; color: var(--muted); font-size: 1.08rem; }
+.tagline { max-width: 54ch; margin-top: 12px; color: var(--muted); font-size: 1.08rem; white-space: pre-line; }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 30px; }
 .meta-item { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: .93rem; }

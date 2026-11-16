@@ -44,7 +44,7 @@ html.game main > .section:nth-of-type(even) { background: color-mix(in srgb, var
 
 .deco, .loot-item { position: absolute; background: var(--img) center / 100% 100% no-repeat; image-rendering: pixelated; }
 .cloud {
-  background: var(--muted); opacity: .16; animation: drift 18s ease-in-out infinite alternate;
+  background: var(--muted); opacity: .16; animation: cloudDrift 18s ease-in-out infinite alternate;
   -webkit-mask: var(--img) center / 100% 100% no-repeat; mask: var(--img) center / 100% 100% no-repeat;
 }
 .game-divider {
@@ -112,7 +112,7 @@ html.game .site-footer { border-top: 4px solid var(--edge); }
 .toast strong { color: var(--accent-strong); }
 
 @keyframes twinkle { 50% { opacity: .15; } }
-@keyframes drift { to { translate: 60px 0; } }
+@keyframes cloudDrift { to { translate: 60px 0; } }
 @keyframes bob { 50% { translate: 0 -6px; } }
 @keyframes bump { 50% { transform: scale(1.12); } }
 @keyframes tick { to { transform: translateX(-50%); } }
