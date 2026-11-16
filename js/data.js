@@ -60,7 +60,7 @@ window.PORTFOLIO = {
       ],
       "links": {
         "github": "",
-        "demo": "",
+        "demo": "https://noone573.github.io/srms-demo/",
         "file": ""
       }
     },
